@@ -344,3 +344,23 @@ Now output ONLY the JSON object. Extract from the ANSWER above. Do not write a n
     except Exception as e:
         print(f"   [extractor] Exception: {e}")
         return fallback
+
+
+def transcribe_audio(audio_bytes: bytes, filename: str = "audio.wav") -> str:
+    """
+    Transcribe audio using Groq Whisper. Supports Telugu and English.
+    Returns the transcript as a string, or an empty string on failure.
+    """
+    try:
+        client = get_client()
+        transcription = client.audio.transcriptions.create(
+            file=(filename, audio_bytes),
+            model="whisper-large-v3-turbo",
+            response_format="text",
+        )
+        if isinstance(transcription, str):
+            return transcription.strip()
+        return (transcription.text or "").strip()
+    except Exception as e:
+        print(f"   [transcribe] Exception: {e}")
+        return ""

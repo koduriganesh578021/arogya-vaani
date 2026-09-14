@@ -12,7 +12,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from src.retrieval import Retriever
-from src.llm import generate_answer_stream, expand_query, extract_structured_data
+from src.llm import generate_answer_stream, expand_query, extract_structured_data, transcribe_audio
 from src.config import TOP_K_FINAL
 from src.rules import check_pmjay, check_aarogyasri, summarize
 
@@ -175,6 +175,159 @@ def _render_structured_cards(structured: dict):
                 unsafe_allow_html=True,
             )
 
+
+def _build_download_text(question: str, answer: str, structured: dict, chunks: list) -> str:
+    """Build a plain-text version of the answer for download."""
+    lines = []
+    lines.append("=" * 60)
+    lines.append("ఆరోగ్య వాణి (Arogya Vaani) — సమాధానం")
+    lines.append("=" * 60)
+    lines.append("")
+    lines.append(f"ప్రశ్న (Question): {question}")
+    lines.append("")
+    lines.append("సమాధానం (Answer):")
+    lines.append(answer.strip())
+    lines.append("")
+
+    docs = structured.get("documents") or []
+    if docs:
+        lines.append("-" * 60)
+        lines.append("అవసరమైన పత్రాలు (Required documents):")
+        for d in docs:
+            req = "అవసరం" if d.get("required") else "షరతులతో"
+            lines.append(f"  • {d.get('name', '—')} [{req}]")
+            if d.get("why"):
+                lines.append(f"      ఎందుకు: {d['why']}")
+            if d.get("if_missing"):
+                lines.append(f"      లేకపోతే: {d['if_missing']}")
+        lines.append("")
+
+    steps = structured.get("next_steps") or []
+    if steps:
+        lines.append("-" * 60)
+        lines.append("తదుపరి చర్యలు (Next steps):")
+        for i, s in enumerate(steps, 1):
+            lines.append(f"  {i}. {s}")
+        lines.append("")
+
+    missing = structured.get("missing_info") or []
+    if missing:
+        lines.append("-" * 60)
+        lines.append("అస్పష్టమైన సమాచారం (Missing information):")
+        for m in missing:
+            lines.append(f"  ⚠ {m}")
+        lines.append("")
+
+    if chunks:
+        lines.append("-" * 60)
+        lines.append("మూలాలు (Sources):")
+        seen = set()
+        for c in chunks:
+            key = (c["metadata"]["source_file"], c["metadata"]["page"])
+            if key in seen:
+                continue
+            seen.add(key)
+            lines.append(f"  • {key[0]}, page {key[1]}")
+        lines.append("")
+
+    lines.append("=" * 60)
+    lines.append("⚠️ ఇది ప్రాథమిక సమాచారం మాత్రమే.")
+    lines.append("అధికారిక అర్హత నిర్ధారణ కోసం దయచేసి ప్రభుత్వ ఆసుపత్రి")
+    lines.append("సహాయ కేంద్రాన్ని సంప్రదించండి.")
+    lines.append("")
+    lines.append("This tool does not provide medical advice or")
+    lines.append("official eligibility decisions.")
+    lines.append("=" * 60)
+
+    return "\n".join(lines)
+
+
+def _render_audio_player(text: str, key_suffix: str = ""):
+    """Render a Listen button that speaks the given text via browser TTS."""
+    import streamlit.components.v1 as components
+
+    # Escape backticks and backslashes so the text is safe inside JS template literals
+    safe_text = (
+        text.replace("\\", "\\\\")
+            .replace("`", "\\`")
+            .replace("${", "\\${")
+    )
+
+    html = f"""
+<div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+  <button id="speak-btn-{key_suffix}" style="
+    background:#1976d2;color:white;border:none;padding:8px 16px;
+    border-radius:6px;cursor:pointer;font-size:15px;
+  ">🔊 వినండి (Listen)</button>
+  <button id="stop-btn-{key_suffix}" style="
+    background:#c62828;color:white;border:none;padding:8px 16px;
+    border-radius:6px;cursor:pointer;font-size:15px;display:none;
+  ">⏹ ఆపండి (Stop)</button>
+  <span id="status-{key_suffix}" style="font-size:13px;color:#555"></span>
+</div>
+
+<script>
+(function() {{
+  const text = `{safe_text}`;
+  const speakBtn = document.getElementById('speak-btn-{key_suffix}');
+  const stopBtn = document.getElementById('stop-btn-{key_suffix}');
+  const status = document.getElementById('status-{key_suffix}');
+  const synth = window.speechSynthesis;
+
+  function pickVoice() {{
+    const voices = synth.getVoices();
+    // Preference order: Telugu, Hindi, Indian English, English
+    return voices.find(v => v.lang === 'te-IN')
+        || voices.find(v => v.lang.startsWith('te'))
+        || voices.find(v => v.lang === 'hi-IN')
+        || voices.find(v => v.lang.startsWith('hi'))
+        || voices.find(v => v.lang === 'en-IN')
+        || voices.find(v => v.lang.startsWith('en'))
+        || voices[0];
+  }}
+
+  speakBtn.addEventListener('click', () => {{
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice();
+    if (v) {{ u.voice = v; u.lang = v.lang; }}
+    u.rate = 0.95;
+    u.pitch = 1.0;
+    u.onstart = () => {{
+      speakBtn.style.display = 'none';
+      stopBtn.style.display = 'inline-block';
+      status.textContent = 'వింటున్నారు... (' + (u.lang || 'default') + ')';
+    }};
+    u.onend = () => {{
+      speakBtn.style.display = 'inline-block';
+      stopBtn.style.display = 'none';
+      status.textContent = '';
+    }};
+    u.onerror = (e) => {{
+      speakBtn.style.display = 'inline-block';
+      stopBtn.style.display = 'none';
+      status.textContent = 'Audio error: ' + e.error;
+    }};
+    synth.speak(u);
+  }});
+
+  stopBtn.addEventListener('click', () => {{
+    synth.cancel();
+    speakBtn.style.display = 'inline-block';
+    stopBtn.style.display = 'none';
+    status.textContent = '';
+  }});
+
+  // Voices load asynchronously in some browsers
+  if (speechSynthesis.onvoiceschanged !== undefined) {{
+    speechSynthesis.onvoiceschanged = () => {{}};
+  }}
+}})();
+</script>
+"""
+
+    components.html(html, height=70)
+
 # -------------------------------------------------------------------
 # SIDEBAR
 # -------------------------------------------------------------------
@@ -235,6 +388,8 @@ with tab_chat:
         st.session_state.messages = []
     if "pending_question" not in st.session_state:
         st.session_state.pending_question = None
+    if "_last_audio_id" not in st.session_state:
+        st.session_state["_last_audio_id"] = None
 
     # Display past messages
     for msg in st.session_state.messages:
@@ -242,6 +397,27 @@ with tab_chat:
             st.markdown(msg["content"], unsafe_allow_html=True)
             if msg["role"] == "assistant" and msg.get("structured"):
                 _render_structured_cards(msg["structured"])
+            if msg["role"] == "assistant" and msg.get("content"):
+                _render_audio_player(
+                    msg["content"],
+                    key_suffix=f"hist_{abs(hash(msg['content'])) % 100000}",
+                )
+                if msg.get("question"):
+                    from datetime import datetime
+                    ts = msg.get("timestamp", datetime.now().strftime("%Y%m%d-%H%M"))
+                    download_text = _build_download_text(
+                        msg["question"],
+                        msg["content"],
+                        msg.get("structured", {}),
+                        msg.get("sources", []),
+                    )
+                    st.download_button(
+                        label="📥 Download explanation",
+                        data=download_text.encode("utf-8"),
+                        file_name=f"arogya-vaani-{ts}.txt",
+                        mime="text/plain",
+                        key=f"hist_download_{ts}_{id(msg)}",
+                    )
             if msg["role"] == "assistant" and show_sources and msg.get("sources"):
                 with st.expander(f"📚 Sources ({len(msg['sources'])} chunks retrieved)", expanded=False):
                     for i, s in enumerate(msg["sources"], 1):
@@ -258,12 +434,36 @@ with tab_chat:
     # -------------------------------------------------------------------
     # INPUT — chat_input OR sidebar quick question
     # -------------------------------------------------------------------
+    # --- Voice input (mic) ---
+    st.markdown("##### 🎙️ లేదా మాట్లాడండి (Or speak)")
+    audio_value = st.audio_input(
+        "Record your question",
+        key="voice_input_widget",
+        label_visibility="collapsed",
+    )
+
+    # --- Text input ---
     user_question = st.chat_input("Ask about PM-JAY or Aarogyasri (Telugu or English)…")
 
-    # If a quick question was clicked, use that
+    # --- If a quick question was clicked, use that ---
     if st.session_state.pending_question:
         user_question = st.session_state.pending_question
         st.session_state.pending_question = None
+
+    # --- If audio was recorded, transcribe it ---
+    if audio_value is not None and not st.session_state.get("_last_audio_id") == id(audio_value):
+        with st.spinner("🎙️ Transcribing your voice..."):
+            try:
+                audio_bytes = audio_value.read()
+                transcript = transcribe_audio(audio_bytes, filename="question.wav")
+                if transcript:
+                    st.session_state["_last_audio_id"] = id(audio_value)
+                    st.success(f"🎙️ **Transcribed:** {transcript}")
+                    user_question = transcript
+                else:
+                    st.warning("Could not transcribe the audio. Please try again or type your question.")
+            except Exception as e:
+                st.error(f"Audio error: {e}")
 
     # -------------------------------------------------------------------
     # PROCESS THE QUESTION
@@ -327,12 +527,29 @@ with tab_chat:
 
             _render_structured_cards(structured)
 
+            _render_audio_player(full_answer, key_suffix=f"live_{abs(hash(user_question)) % 100000}")
+
+            # Download button
+            download_text = _build_download_text(user_question, full_answer, structured, chunks)
+            from datetime import datetime
+            timestamp = datetime.now().strftime("%Y%m%d-%H%M")
+            st.download_button(
+                label="📥 సమాధానాన్ని డౌన్‌లోడ్ చేయండి (Download explanation)",
+                data=download_text.encode("utf-8"),
+                file_name=f"arogya-vaani-{timestamp}.txt",
+                mime="text/plain",
+                key=f"download_{timestamp}",
+            )
+
             # Save to history
+            from datetime import datetime
             st.session_state.messages.append({
                 "role": "assistant",
                 "content": full_answer,
                 "sources": chunks,
                 "structured": structured,
+                "question": user_question,
+                "timestamp": datetime.now().strftime("%Y%m%d-%H%M"),
             })
 
             # Show sources inline after the answer (for the current turn)
