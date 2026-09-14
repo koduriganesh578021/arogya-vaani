@@ -42,21 +42,34 @@ class Retriever:
             return f"query: {query}"
         return query
 
-    def _vector_search(self, query: str, k: int):
+    def _vector_search(self, query: str, k: int, scheme: str | None = None):
         q_emb = self.model.encode(
             [self._prepare_query(query)],
             normalize_embeddings=True,
         ).tolist()
-        results = self.collection.query(query_embeddings=q_emb, n_results=k)
+        # Optional metadata filter: only filter when a specific scheme is
+        # requested ("both" or None means search across both schemes).
+        where = None
+        if scheme is not None and scheme != "both":
+            where = {"scheme": scheme}
+        results = self.collection.query(
+            query_embeddings=q_emb, n_results=k, where=where
+        )
         return results["ids"][0]
 
-    def _bm25_search(self, query: str, k: int):
+    def _bm25_search(self, query: str, k: int, scheme: str | None = None):
         tokens = self._tokenize(query)
         scores = self.bm25.get_scores(tokens)
-        ranked = sorted(
-            range(len(scores)), key=lambda i: scores[i], reverse=True
-        )[:k]
-        return [self.bm25_ids[i] for i in ranked]
+        # Build ranked list, skipping non-matching schemes
+        ranked = []
+        for i in sorted(range(len(scores)), key=lambda i: scores[i], reverse=True):
+            if scheme and scheme not in ("both", ""):
+                if self.chunks[i]["metadata"]["scheme"] != scheme:
+                    continue
+            ranked.append(self.bm25_ids[i])
+            if len(ranked) >= k:
+                break
+        return ranked
 
     @staticmethod
     def _rrf_fuse(ranked_lists, k: int):
@@ -67,10 +80,26 @@ class Retriever:
         fused = sorted(scores.items(), key=lambda x: x[1], reverse=True)
         return fused[:k]
 
-    def search(self, query: str, k: int = TOP_K_FINAL):
-        vec_ids = self._vector_search(query, TOP_K_VECTOR)
-        bm25_ids = self._bm25_search(query, TOP_K_BM25)
+    def search(self, query: str, k: int = TOP_K_FINAL, scheme: str | None = None):
+        vec_ids = self._vector_search(query, TOP_K_VECTOR, scheme)
+        bm25_ids = self._bm25_search(query, TOP_K_BM25, scheme=scheme)
         fused = self._rrf_fuse([vec_ids, bm25_ids], k)
+        # Final safety filter: drop any chunks not matching the requested scheme
+        if scheme and scheme not in ("both", ""):
+            fused = [(doc_id, score) for doc_id, score in fused
+                     if self.chunk_by_id[doc_id]["metadata"]["scheme"] == scheme]
+
+        # Deduplicate: keep best-scoring chunk per (source_file, page)
+        seen_pages = set()
+        deduped = []
+        for doc_id, score in fused:
+            meta = self.chunk_by_id[doc_id]["metadata"]
+            key = (meta["source_file"], meta["page"])
+            if key in seen_pages:
+                continue
+            seen_pages.add(key)
+            deduped.append((doc_id, score))
+        fused = deduped[:k]
 
         out = []
         for doc_id, score in fused:

@@ -12,7 +12,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from src.retrieval import Retriever
-from src.llm import generate_answer_stream
+from src.llm import generate_answer_stream, expand_query
 from src.config import TOP_K_FINAL
 
 # -------------------------------------------------------------------
@@ -168,8 +168,18 @@ if user_question:
     with st.chat_message("assistant"):
         retriever = load_retriever()
 
-        with st.spinner("🔍 Retrieving relevant scheme information..."):
-            chunks = retriever.search(user_question, k=TOP_K_FINAL + 1)
+        with st.spinner("🔍 Expanding query and retrieving relevant scheme information..."):
+            expanded = expand_query(user_question)
+            combined_query = f"{user_question} {expanded['keywords']}"
+            chunks = retriever.search(
+                combined_query,
+                k=TOP_K_FINAL + 1,
+                scheme=expanded["scheme"],
+            )
+
+        if show_debug:
+            st.caption(f"Expanded keywords: {expanded['keywords']}")
+            st.caption(f"Detected scheme: {expanded['scheme']}")
 
         # Filter by scheme if user chose one
         if scheme_choice != "Both":
@@ -192,10 +202,7 @@ if user_question:
         try:
             for token in generate_answer_stream(user_question, chunks):
                 full_answer += token
-                placeholder.markdown(
-                    f"<div class='telugu-text'>{full_answer}</div>",
-                    unsafe_allow_html=True,
-                )
+                placeholder.markdown(full_answer)
         except Exception as e:
             st.error(f"Error calling LLM: {e}")
             full_answer = "క్షమించండి, సాంకేతిక సమస్య ఏర్పడింది. దయచేసి మళ్లీ ప్రయత్నించండి."
@@ -203,7 +210,7 @@ if user_question:
         # Save to history
         st.session_state.messages.append({
             "role": "assistant",
-            "content": f"<div class='telugu-text'>{full_answer}</div>",
+            "content": full_answer,
             "sources": chunks,
         })
 

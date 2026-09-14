@@ -7,7 +7,7 @@ Run:
 import sys
 
 from src.retrieval import Retriever
-from src.llm import generate_answer
+from src.llm import generate_answer, expand_query
 
 
 def answer_question(question: str, verbose: bool = True) -> str:
@@ -16,7 +16,14 @@ def answer_question(question: str, verbose: bool = True) -> str:
         print("🔍 Retrieving relevant chunks...")
 
     retriever = Retriever()
-    chunks = retriever.search(question, k=4)
+    if verbose:
+        print("🧠 Expanding query with LLM...")
+    expanded = expand_query(question)
+    if verbose:
+        print(f"   Keywords: {expanded['keywords']}")
+        print(f"   Scheme:   {expanded['scheme']}")
+    combined_query = f"{question} {expanded['keywords']}"
+    chunks = retriever.search(combined_query, k=4, scheme=expanded["scheme"])
 
     if verbose:
         print(f"   Found {len(chunks)} chunks.")

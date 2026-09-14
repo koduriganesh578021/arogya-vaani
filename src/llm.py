@@ -2,11 +2,12 @@
 Groq LLM wrapper.
 Centralizes the model call and the Arogya Vaani system prompt.
 """
+import json
 import os
 from groq import Groq
 from dotenv import load_dotenv
 
-from src.config import GROQ_MODEL
+from src.config import GROQ_MODEL, GROQ_MODEL_FAST
 
 load_dotenv()
 
@@ -150,3 +151,82 @@ Now produce your response following the STRICT RULES and the exact output STRUCT
         delta = chunk.choices[0].delta.content
         if delta:
             yield delta
+
+
+# ---------------------------------------------------------------
+# QUERY EXPANSION
+# Uses the fast model to turn a (possibly Telugu / Romanized-Telugu)
+# question into English keywords for retrieval + scheme detection.
+# ---------------------------------------------------------------
+QUERY_EXPANSION_PROMPT = """You are a query-expansion module for a healthcare scheme search engine covering PM-JAY (national) and Aarogyasri (Telangana).
+
+The user question may be in Telugu script, Romanized Telugu, English, or a mix.
+
+Return ONLY a JSON object with exactly these two keys:
+- "keywords": a comma-separated string of English keywords and short phrases that capture the information need (scheme names, document names, eligibility terms). No Telugu words.
+- "scheme": the scheme the question is about. Must be exactly one of: "pmjay", "aarogyasri", or "both".
+
+Example:
+Question: Aarogyasri ki em documents kavali?
+Output: {"keywords": "Aarogyasri scheme required documents Aadhaar ration card eligibility enrollment", "scheme": "aarogyasri"}
+
+Output only the JSON object — no explanations, no markdown code fences."""
+
+
+def expand_query(question: str) -> dict:
+    """
+    Expand a user question into English keywords for better retrieval and
+    detect which scheme it is about, using the fast Groq model.
+
+    Returns a dict:
+        {"keywords": <comma-separated English keywords>,
+         "scheme": "pmjay" | "aarogyasri" | "both"}
+
+    Falls back to {"keywords": question, "scheme": "both"} if the model
+    call or JSON parsing fails, so retrieval can proceed on the raw question.
+    """
+    try:
+        client = get_client()
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": QUERY_EXPANSION_PROMPT},
+                {"role": "user", "content": question},
+            ],
+            temperature=0.1,
+            max_tokens=200,
+        )
+        raw = response.choices[0].message.content.strip()
+        if not raw or len(raw) < 5:
+            print("   [warn] Empty expansion response, retrying once...")
+            retry = client.chat.completions.create(
+                model=GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": QUERY_EXPANSION_PROMPT},
+                    {"role": "user", "content": question},
+                ],
+                temperature=0.2,
+                max_tokens=300,
+            )
+            raw = (retry.choices[0].message.content or "").strip()
+        # Strip markdown code fences if the model wrapped the JSON
+        cleaned = raw.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned
+            if cleaned.rstrip().endswith("```"):
+                cleaned = cleaned.rstrip()[:-3]
+        cleaned = cleaned.strip()
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1:
+            cleaned = cleaned[start:end+1]
+        parsed = json.loads(cleaned)
+        keywords = str(parsed.get("keywords", "")).strip()
+        scheme = str(parsed.get("scheme", "")).strip().lower()
+        if scheme not in ("pmjay", "aarogyasri", "both"):
+            scheme = "both"
+        if not keywords:
+            keywords = question
+        return {"keywords": keywords, "scheme": scheme}
+    except Exception:
+        return {"keywords": question, "scheme": "both"}

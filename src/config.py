@@ -53,22 +53,22 @@ PDF_METADATA = {
         "description": "PM-JAY Health Benefit Packages — covered treatments",
     },
     "NEHS-Guidelines-DoCoVP_I.pdf": {
-        "scheme": "aarogyasri",
+        "scheme": "nehs",
         "authority": "Aarogyasri Health Care Trust, Telangana",
-        "doc_type": "implementation_guidelines",
-        "description": "Telangana Aarogyasri / NEHS implementation guidelines",
+        "doc_type": "scheme_guidelines",
+        "description": "Telangana New Employees Health Scheme (NEHS) guidelines",
     },
     "m5.pdf": {
-        "scheme": "aarogyasri",
+        "scheme": "ap_ehs",
         "authority": "Government of Telangana",
         "doc_type": "eligibility_criteria",
-        "description": "Aarogyasri eligibility criteria and covered categories",
+        "description": "Andhra Pradesh Employees Health Scheme (2013) — legacy reference",
     },
     "m7.pdf": {
-        "scheme": "aarogyasri",
+        "scheme": "ap_ehs",
         "authority": "Government of Telangana",
         "doc_type": "therapy_coverage",
-        "description": "Aarogyasri covered therapies and package pricing",
+        "description": "Andhra Pradesh Employees Health Scheme — therapy prices (2013) — legacy reference",
     },
 }
 
