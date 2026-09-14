@@ -12,7 +12,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 import streamlit as st
 
 from src.retrieval import Retriever
-from src.llm import generate_answer_stream, expand_query
+from src.llm import generate_answer_stream, expand_query, extract_structured_data
 from src.config import TOP_K_FINAL
 from src.rules import check_pmjay, check_aarogyasri, summarize
 
@@ -118,6 +118,63 @@ def _render_precheck_results(rules, scheme):
         unsafe_allow_html=True,
     )
 
+
+def _render_structured_cards(structured: dict):
+    """Render documents, next_steps, and missing_info as visual cards."""
+    docs = structured.get("documents") or []
+    steps = structured.get("next_steps") or []
+    missing = structured.get("missing_info") or []
+
+    # Documents card
+    if docs:
+        st.markdown("### 📄 అవసరమైన పత్రాలు")
+        for d in docs:
+            name = d.get("name", "—")
+            required = d.get("required", False)
+            why = d.get("why", "")
+            if_missing = d.get("if_missing", "")
+            tag_color = "#d32f2f" if required else "#f57c00"
+            tag_text = "అవసరం" if required else "షరతులతో"
+            st.markdown(
+                f"<div style='border-left:4px solid {tag_color};"
+                f"padding:8px 12px;margin:6px 0;background:#fafafa;border-radius:4px'>"
+                f"<b>{name}</b> "
+                f"<span style='background:{tag_color};color:white;padding:1px 8px;"
+                f"border-radius:10px;font-size:0.75rem;margin-left:6px'>{tag_text}</span>"
+                f"<br><small><b>Why:</b> {why}</small>"
+                f"<br><small><b>If missing:</b> {if_missing}</small>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+
+    # Next steps card
+    if steps:
+        st.markdown("### ➡️ తదుపరి చర్యలు")
+        steps_html = ""
+        for i, s in enumerate(steps, 1):
+            steps_html += (
+                f"<div style='display:flex;align-items:flex-start;margin:8px 0'>"
+                f"<div style='background:#2e7d32;color:white;min-width:26px;height:26px;"
+                f"border-radius:50%;display:flex;align-items:center;justify-content:center;"
+                f"font-weight:bold;margin-right:10px'>{i}</div>"
+                f"<div style='padding-top:2px'>{s}</div>"
+                f"</div>"
+            )
+        st.markdown(
+            f"<div style='background:#f5f5f5;padding:12px;border-radius:6px'>{steps_html}</div>",
+            unsafe_allow_html=True,
+        )
+
+    # Missing info card
+    if missing:
+        st.markdown("### ⚠️ అస్పష్టమైన సమాచారం")
+        for m in missing:
+            st.markdown(
+                f"<div style='border-left:4px solid #f57c00;padding:8px 12px;"
+                f"background:#fff8e1;border-radius:4px;margin:6px 0'>{m}</div>",
+                unsafe_allow_html=True,
+            )
+
 # -------------------------------------------------------------------
 # SIDEBAR
 # -------------------------------------------------------------------
@@ -183,6 +240,8 @@ with tab_chat:
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"], unsafe_allow_html=True)
+            if msg["role"] == "assistant" and msg.get("structured"):
+                _render_structured_cards(msg["structured"])
             if msg["role"] == "assistant" and show_sources and msg.get("sources"):
                 with st.expander(f"📚 Sources ({len(msg['sources'])} chunks retrieved)", expanded=False):
                     for i, s in enumerate(msg["sources"], 1):
@@ -258,11 +317,22 @@ with tab_chat:
                 st.error(f"Error calling LLM: {e}")
                 full_answer = "క్షమించండి, సాంకేతిక సమస్య ఏర్పడింది. దయచేసి మళ్లీ ప్రయత్నించండి."
 
+            # Extract structured cards
+            structured = {"documents": [], "next_steps": [], "missing_info": [], "preliminary_only": True}
+            if full_answer and len(full_answer) > 50 and "క్షమించండి" not in full_answer:
+                try:
+                    structured = extract_structured_data(user_question, full_answer, chunks)
+                except Exception as e:
+                    st.caption(f"(Structured extraction skipped: {e})")
+
+            _render_structured_cards(structured)
+
             # Save to history
             st.session_state.messages.append({
                 "role": "assistant",
                 "content": full_answer,
                 "sources": chunks,
+                "structured": structured,
             })
 
             # Show sources inline after the answer (for the current turn)

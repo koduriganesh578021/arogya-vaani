@@ -230,3 +230,117 @@ def expand_query(question: str) -> dict:
         return {"keywords": keywords, "scheme": scheme}
     except Exception:
         return {"keywords": question, "scheme": "both"}
+
+
+EXTRACTOR_SYSTEM_PROMPT = """You extract structured data for Arogya Vaani, a Telugu-first healthcare copilot.
+
+Output ONLY a JSON object with these keys:
+
+{
+"documents": [{"name": "<bilingual: Telugu (English) or English only>", "required": true|false, "why": "<SIMPLE TELUGU, max 8 words>", "if_missing": "<SIMPLE TELUGU, max 8 words>"}],
+"next_steps": ["<SIMPLE TELUGU, max 12 words>"],
+"missing_info": ["<SIMPLE TELUGU, max 12 words>"],
+"preliminary_only": true|false
+}
+
+LANGUAGE RULES (VERY IMPORTANT):
+- why, if_missing, next_steps, missing_info MUST be in simple conversational Telugu.
+- Document names: "Telugu name (English)" if both exist, else English alone.
+- Keep all Telugu fields SHORT. Aim for 5-10 words per field.
+- If the answer abstains, put reason in missing_info (Telugu) and leave other fields empty.
+
+## OUTPUT ONLY THE JSON. No explanation. No markdown fences. No reasoning."""
+
+
+def extract_structured_data(question: str, answer: str, chunks: list[dict]) -> dict:
+    """
+    Extract structured data from a Telugu answer using a dedicated extractor prompt.
+    Returns a dict with keys: documents, next_steps, missing_info, preliminary_only.
+    """
+    EXTRACTOR_PROMPT = """You extract structured data from a Telugu answer.
+
+Output ONLY a JSON object with this exact shape:
+
+{
+"documents": [{"name": "Telugu name (English name)", "required": true, "why": "short Telugu reason", "if_missing": "short Telugu action"}],
+"next_steps": ["short Telugu step"],
+"missing_info": ["short Telugu gap"],
+"preliminary_only": true
+}
+
+STRICT RULES:
+
+- Output ONLY the JSON object. No prose. No markdown. No explanation.
+- Do NOT answer the question. Only EXTRACT data from the answer text provided.
+- why, if_missing, next_steps, missing_info MUST be in simple conversational Telugu.
+- Keep each Telugu field to 10 words or fewer.
+- If the answer is an abstention (says "తెలియదు" or "I don't know"), put the reason in missing_info and use [] for documents and next_steps.
+- If no documents are mentioned, use [].
+- If no next steps are mentioned, use []."""
+
+    # Build a compact chunk summary
+    chunk_summary = "\n".join(
+        f"- {c['metadata']['source_file']} p{c['metadata']['page']}"
+        for c in chunks[:4]
+    )
+
+    user_msg = f"""QUESTION:
+{question}
+
+ANSWER (already written in Telugu — extract data FROM this, do not answer again):
+{answer}
+
+SOURCES:
+{chunk_summary}
+
+Now output ONLY the JSON object. Extract from the ANSWER above. Do not write a new answer."""
+
+    fallback = {
+        "documents": [],
+        "next_steps": [],
+        "missing_info": ["Structured data could not be extracted."],
+        "preliminary_only": True,
+    }
+
+    try:
+        client = get_client()
+        response = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": EXTRACTOR_PROMPT},
+                {"role": "user", "content": user_msg},
+            ],
+            temperature=0.0,
+            max_tokens=2500,
+            response_format={"type": "json_object"},
+        )
+        raw = response.choices[0].message.content
+        if not raw:
+            print("   [extractor] Empty response")
+            return fallback
+
+        raw = raw.strip()
+        # Strip code fences if any
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw
+            if raw.rstrip().endswith("```"):
+                raw = raw.rstrip()[:-3]
+        raw = raw.strip()
+        # Grab outermost object
+        s = raw.find("{")
+        e = raw.rfind("}")
+        if s != -1 and e != -1:
+            raw = raw[s:e+1]
+
+        parsed = json.loads(raw)
+
+        # Ensure all keys exist
+        return {
+            "documents": parsed.get("documents", []) or [],
+            "next_steps": parsed.get("next_steps", []) or [],
+            "missing_info": parsed.get("missing_info", []) or [],
+            "preliminary_only": parsed.get("preliminary_only", True),
+        }
+    except Exception as e:
+        print(f"   [extractor] Exception: {e}")
+        return fallback
