@@ -70,6 +70,12 @@ PDF_METADATA = {
         "doc_type": "therapy_coverage",
         "description": "Andhra Pradesh Employees Health Scheme — therapy prices (2013) — legacy reference",
     },
+    "aarogyasri_kamareddy.pdf": {
+        "scheme": "aarogyasri",
+        "authority": "Aarogyasri Health Care Trust, Government of Telangana",
+        "doc_type": "scheme_overview",
+        "description": "Aarogyasri scheme overview — coverage amount, procedures, hospital network, dialysis and high-end therapies (Telugu)",
+    },
 }
 
 # ---------- Retrieval ----------
