@@ -14,9 +14,6 @@ env/
 .pytest_cache/
 
 # Data — large/generated files
-data/raw_pdfs/*.pdf
-data/processed/*.json
-data/chroma_db/
 data/embeddings/
 
 # IDE
