@@ -6,3 +6,5 @@ pypdf
 langchain-text-splitters
 groq
 python-dotenv
+torch
+transformers
