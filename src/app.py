@@ -147,15 +147,21 @@ st.markdown(
 
     /* Audio Input Card Styling */
     div[data-testid="stAudioInput"] {
-        background: #fafafa;
-        border: 1px dashed #b0bec5;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 12px;
+        background: #fafafa !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        padding: 8px 14px !important;
+        margin-bottom: 8px !important;
+        min-height: 56px !important;
     }
     div[data-testid="stAudioInput"] label {
-        font-size: 14px !important;
-        color: var(--av-text-muted) !important;
+        font-size: 13px !important;
+        color: #757575 !important;
+        margin-bottom: 4px !important;
+    }
+    div[data-testid="stAudioInput"] audio,
+    div[data-testid="stAudioInput"] > div > audio + div {
+        height: 32px !important;
     }
 
     /* Sidebar */
@@ -253,21 +259,82 @@ st.markdown(
         line-height: 1.55;
     }
 
-    /* Action Buttons Row */
-    div[data-testid="stDownloadButton"] > button {
-        border: 1px solid #616161 !important;
-        color: #616161 !important;
-        background: transparent !important;
-        height: 40px !important;
-        min-height: 40px !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        box-shadow: none !important;
+    /* Action Buttons Row - Match Listen & Download buttons */
+    div[data-testid="stDownloadButton"],
+    .stDownloadButton {
+        display: block !important;
+        height: 48px !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
-    div[data-testid="stDownloadButton"] > button:hover {
-        background: #f5f5f5 !important;
-        color: #212121 !important;
+    div[data-testid="stDownloadButton"] > button,
+    .stDownloadButton > button,
+    div[data-testid="stDownloadButton"] button {
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+        padding: 0 16px !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        border: 1px solid #2e7d32 !important;
+        color: #2e7d32 !important;
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        font-family: 'Inter', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        width: 100% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        box-shadow: none !important;
+        transition: all 0.15s ease !important;
+    }
+    div[data-testid="stDownloadButton"] > button:hover,
+    .stDownloadButton > button:hover,
+    div[data-testid="stDownloadButton"] button:hover {
+        background: #f1f8e9 !important;
+        border-color: #2e7d32 !important;
+        color: #1b5e20 !important;
+    }
+    div[data-testid="stDownloadButton"] button p,
+    .stDownloadButton button p {
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        color: #2e7d32 !important;
+        margin: 0 !important;
+        line-height: 1 !important;
+    }
+    div[data-testid="stDownloadButton"] button:hover p,
+    .stDownloadButton button:hover p {
+        color: #1b5e20 !important;
+    }
+
+    /* Empty State Guidance & Chips */
+    .av-empty-state {
+        text-align: center;
+        padding: 40px 20px 20px 20px;
+        background: #fafafa;
+        border-radius: 12px;
+        margin: 20px 0 16px 0;
+    }
+    section.main div[data-testid="stButton"] > button:has(
+        div:contains("PM-JAY")
+    ),
+    section.main div[data-testid="stButton"] > button:has(
+        div:contains("Aarogyasri")
+    ),
+    section.main div[data-testid="stButton"] > button:has(
+        div:contains("documents")
+    ) {
+        background: #ffffff !important;
+        border: 1px solid #c8e6c9 !important;
+        color: #2e7d32 !important;
+        border-radius: 20px !important;
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+        height: auto !important;
+        min-height: 44px !important;
+        white-space: normal !important;
     }
 
     /* Cards and Containers */
@@ -294,6 +361,257 @@ st.markdown(
         border-radius: 6px;
         margin-top: 1rem;
         font-size: 0.9rem;
+    }
+
+    /* Question input row */
+    div[data-testid="stTextInput"] input {
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 10px !important;
+        padding: 14px 16px !important;
+        font-size: 15px !important;
+    }
+    div[data-testid="stTextInput"] input:focus {
+        border-color: #2e7d32 !important;
+        box-shadow: 0 0 0 2px #e8f5e9 !important;
+    }
+
+    /* Question Callout Bubble */
+    .av-question-bubble {
+        background: #f5f5f5;
+        border-left: 3px solid #9e9e9e;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+    .av-question-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #757575;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+    .av-question-text {
+        font-size: 15px;
+        color: #212121;
+        line-height: 1.5;
+    }
+    .av-answer-body {
+        color: #1a1a1a !important;
+    }
+
+    /* Answer panel — generous spacing */
+    .av-answer-panel {
+        background: #ffffff;
+        border-left: 4px solid #2e7d32;
+        border-radius: 12px;
+        padding: 24px 28px;
+        margin-top: 16px;
+        margin-bottom: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    /* Input row — compact, bottom-pinned feel */
+    section.main div[data-testid="stHorizontalBlock"]:has(
+        div[data-testid="stTextInput"] input[placeholder*="ప్రశ్న"]
+    ) {
+        margin-top: 12px;
+        margin-bottom: 8px;
+    }
+
+    /* Recent question buttons in sidebar */
+    section[data-testid="stSidebar"] div[data-testid="stButton"] > button {
+        text-align: left !important;
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+        height: auto !important;
+        white-space: normal !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Two-column layout top alignment */
+    section.main div[data-testid="stHorizontalBlock"] {
+        align-items: flex-start !important;
+    }
+
+    /* Info Banner */
+    .av-info-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #e3f2fd;
+        color: #0d47a1;
+        border-left: 4px solid #1565c0;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+    .av-info-icon { font-size: 16px; }
+
+    /* Form Card & Inputs */
+    div[data-testid="stForm"] {
+        background: #ffffff;
+        border: 1px solid #e8e8e8 !important;
+        border-radius: 12px !important;
+        padding: 24px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    }
+    .av-card-header {
+        font-size: 17px;
+        font-weight: 600;
+        color: #212121;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    section.main div[data-testid="stSelectbox"] > div > div {
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+    }
+    section.main div[data-testid="stNumberInput"] input {
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        padding: 12px 14px !important;
+    }
+
+    /* Prominent Run Check Submit Button */
+    section.main div[data-testid="stFormSubmitButton"] > button {
+        background: #2e7d32 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 14px 20px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        width: 100% !important;
+        height: 48px !important;
+        box-shadow: 0 2px 4px rgba(46,125,50,0.2) !important;
+    }
+    section.main div[data-testid="stFormSubmitButton"] > button:hover {
+        background: #1b5e20 !important;
+        box-shadow: 0 3px 6px rgba(46,125,50,0.3) !important;
+    }
+
+    /* Rule Outcome Cards */
+    .av-rule-card {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #e8e8e8;
+        background: #ffffff;
+    }
+    .av-rule-card.pass { border-left: 4px solid #2e7d32; }
+    .av-rule-card.fail { border-left: 4px solid #d32f2f; }
+    .av-rule-card.warn { border-left: 4px solid #f57c00; }
+    .av-rule-icon {
+        min-width: 28px; height: 28px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 14px;
+        flex-shrink: 0;
+    }
+    .av-rule-card.pass .av-rule-icon { background: #e8f5e9; color: #2e7d32; }
+    .av-rule-card.fail .av-rule-icon { background: #ffebee; color: #d32f2f; }
+    .av-rule-card.warn .av-rule-icon { background: #fff8e1; color: #f57c00; }
+    .av-rule-title { font-weight: 600; font-size: 14px; color: #212121; }
+    .av-rule-reason {
+        font-size: 13px;
+        color: #37474f;
+        line-height: 1.6;
+        margin-top: 5px;
+    }
+
+    /* Scheme Result Verdict Cards */
+    .av-result-card {
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 14px;
+    }
+    .av-result-card.eligible {
+        background: #e8f5e9;
+        border: 1px solid #a5d6a7;
+    }
+    .av-result-card.not-eligible {
+        background: #ffebee;
+        border: 1px solid #ef9a9a;
+    }
+    .av-result-card.unclear {
+        background: #fff8e1;
+        border: 1px solid #ffe082;
+    }
+    .av-result-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .av-result-card.eligible .av-result-header { color: #1b5e20; }
+    .av-result-card.not-eligible .av-result-header { color: #b71c1c; }
+    .av-result-card.unclear .av-result-header { color: #e65100; }
+    .av-result-reason {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #37474f;
+    }
+
+    /* Summary Text Card */
+    .av-summary-card {
+        background: #fafafa;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-top: 12px;
+    }
+    .av-summary-card .av-summary-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #616161;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .av-summary-card .av-summary-text {
+        font-size: 14px;
+        color: #212121;
+        line-height: 1.65;
+    }
+
+    /* Top bar logo button */
+    div.st-key-home_logo_btn > button,
+    section.main div[data-testid="stButton"] > button[kind="secondary"]:has(
+        div:contains("ఆరోగ్య వాణి")
+    ),
+    section.main div[data-testid="stButton"] > button:has(
+        p:contains("ఆరోగ్య వాణి")
+    ) {
+        background: transparent !important;
+        border: none !important;
+        color: #2e7d32 !important;
+        text-align: left !important;
+        padding: 8px 12px !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        line-height: 1.35 !important;
+        white-space: pre-line !important;
+        box-shadow: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        width: auto !important;
+        cursor: pointer;
+    }
+    div.st-key-home_logo_btn > button:hover,
+    section.main div[data-testid="stButton"] > button[kind="secondary"]:has(
+        div:contains("ఆరోగ్య వాణి")
+    ):hover {
+        background: #f1f8e9 !important;
+        border-radius: 8px !important;
     }
 
     /* Hide Streamlit default chrome */
@@ -325,31 +643,67 @@ STATUS_LABELS = {
 
 
 def _render_precheck_results(rules, scheme):
-    st.markdown("---")
-    st.markdown(f"#### Preliminary Indicators — {scheme}")
-
-    for r in rules:
-        icon = STATUS_ICONS.get(r["status"], "⚪")
-        label = STATUS_LABELS.get(r["status"], r["status"])
-        with st.container():
-            st.markdown(f"**{icon} {r['factor']}** — *{label}*")
-            st.caption(r["reason"])
-
     summary = summarize(rules)
     counts = summary["counts"]
 
-    st.markdown("---")
+    if summary["summary"] == "preliminary_positive":
+        res_class = "eligible"
+        verdict = "అర్హులు (Eligible)"
+        icon = "✓"
+    elif summary["summary"] == "preliminary_missing":
+        res_class = "not-eligible"
+        verdict = "అనర్హులు / పత్రాలు అవసరం (Not Eligible / Missing Docs)"
+        icon = "✕"
+    else:
+        res_class = "unclear"
+        verdict = "పరిశీలన అవసరం (Needs Verification)"
+        icon = "!"
+
     st.markdown(
-        f"**Summary:** {counts['met']} present · "
-        f"{counts['not_met']} missing · {counts['unclear']} unclear"
+        f"""
+        <div class="av-result-card {res_class}">
+          <div class="av-result-header">
+            <span class="av-result-icon">{icon}</span>
+            <span>{scheme}: {verdict}</span>
+          </div>
+          <div class="av-result-reason">{summary["summary_text"]}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    if summary["summary"] == "preliminary_missing":
-        st.warning(summary["summary_text"])
-    elif summary["summary"] == "preliminary_positive":
-        st.success(summary["summary_text"])
-    else:
-        st.info(summary["summary_text"])
+    st.markdown(f"#### ప్రాథమిక సూచికలు ({scheme})")
+
+    for r in rules:
+        status_key = r.get("status", "unclear")
+        card_class = "pass" if status_key == "met" else ("fail" if status_key == "not_met" else "warn")
+        icon = "✓" if status_key == "met" else ("✕" if status_key == "not_met" else "!")
+        factor = r.get("factor", "")
+        reason = r.get("reason", "")
+        st.markdown(
+            f"""
+            <div class="av-rule-card {card_class}">
+              <div class="av-rule-icon">{icon}</div>
+              <div class="av-rule-body">
+                <div class="av-rule-title">{factor}</div>
+                <div class="av-rule-reason">{reason}</div>
+              </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown(
+        f"""
+        <div class="av-summary-card">
+          <div class="av-summary-label">అర్హత నివేదిక సారాంశం (Summary)</div>
+          <div class="av-summary-text">
+            <b>{counts['met']}</b> present · <b>{counts['not_met']}</b> missing · <b>{counts['unclear']}</b> unclear
+          </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     st.markdown(
         "<div class='disclaimer'>"
@@ -502,17 +856,57 @@ def _render_audio_player(text: str, key_suffix: str = ""):
     )
 
     html = f"""
-<div style="display:flex;align-items:center;gap:10px;margin-top:16px">
-  <button id="speak-btn-{key_suffix}" style="
-    background:transparent;color:#2e7d32;border:1px solid #2e7d32;padding:8px 16px;
-    border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;
-    height:40px;display:inline-flex;align-items:center;gap:6px;transition:all 0.15s;
-  ">🔊 వినండి (Listen)</button>
-  <button id="stop-btn-{key_suffix}" style="
-    background:transparent;color:#d32f2f;border:1px solid #d32f2f;padding:8px 16px;
-    border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;font-family:'Inter',sans-serif;
-    height:40px;display:none;align-items:center;gap:6px;transition:all 0.15s;
-  ">⏹ ఆపండి (Stop)</button>
+<style>
+* {{ box-sizing: border-box; margin: 0; padding: 0; }}
+body {{ margin: 0; padding: 0; background: transparent; overflow: hidden; }}
+.av-act-btn {{
+  background: #ffffff;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 48px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}}
+.av-act-btn:hover {{
+  background: #f1f8e9;
+}}
+.av-stop-btn {{
+  background: #ffffff;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: 0 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 48px;
+  width: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+}}
+.av-stop-btn:hover {{
+  background: #ffebee;
+}}
+</style>
+<div style="display:flex;align-items:center;gap:10px;margin:0;padding:0;height:48px;">
+  <button id="speak-btn-{key_suffix}" class="av-act-btn">🔊 వినండి</button>
+  <button id="stop-btn-{key_suffix}" class="av-stop-btn">⏹ ఆపండి</button>
   <span id="status-{key_suffix}" style="font-size:13px;color:#555"></span>
 </div>
 
@@ -574,7 +968,7 @@ def _render_audio_player(text: str, key_suffix: str = ""):
 </script>
 """
 
-    components.html(html, height=70)
+    components.html(html, height=48)
 
 # -------------------------------------------------------------------
 # SESSION STATE INITIALIZATION
@@ -593,41 +987,63 @@ if "pending_question" not in st.session_state:
     st.session_state.pending_question = None
 if "_last_audio_id" not in st.session_state:
     st.session_state["_last_audio_id"] = None
+if "scheme_choice" not in st.session_state:
+    st.session_state.scheme_choice = "Both"
+if "show_mic" not in st.session_state:
+    st.session_state.show_mic = False
+if "current_question" not in st.session_state:
+    st.session_state.current_question = None
+if "current_answer" not in st.session_state:
+    st.session_state.current_answer = None
+if "current_structured" not in st.session_state:
+    st.session_state.current_structured = None
+if "current_chunks" not in st.session_state:
+    st.session_state.current_chunks = []
+if "recent_questions" not in st.session_state:
+    st.session_state.recent_questions = []  # list of dicts: {q, answer, structured, chunks, ts}
 
 # -------------------------------------------------------------------
 # TOP APP BAR
 # -------------------------------------------------------------------
-st.markdown(
-    """
-    <div style="display:flex;width:100%;min-height:60px;background:#ffffff;border-bottom:1px solid #e0e0e0;padding:12px 24px;align-items:center;justify-content:space-between;border-radius:8px;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-          <path d="M12 9v6m-3-3h6"/>
-        </svg>
-        <div>
-          <div style="font-family:'Noto Sans Telugu', sans-serif;font-size:18px;font-weight:700;color:#2e7d32;line-height:1.2;">ఆరోగ్య వాణి</div>
-          <div style="font-size:11px;color:#616161;letter-spacing:0.5px;font-weight:600;text-transform:uppercase;">AROGYA VAANI • Telangana Scheme Copilot</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="background:#e3f2fd;color:#1565c0;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;">
-          👤 ఆశా కార్యకర్త (ASHA Volunteer)
-        </span>
-        <a href="#" style="background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
-          📍 TS Health Portal
-        </a>
-      </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+top_left, top_right = st.columns([2, 1])
+
+with top_left:
+    if st.button(
+        "💚  ఆరోగ్య వాణి\nAROGYA VAANI • TELANGANA SCHEME COPILOT",
+        key="home_logo_btn",
+        help="Home",
+    ):
+        st.session_state.messages = []
+        st.session_state.current_question = None
+        st.session_state.current_answer = None
+        st.session_state.current_structured = None
+        st.session_state.current_chunks = []
+        st.session_state.active_tab = "chat"
+        st.session_state.precheck_submitted = False
+        st.session_state["precheck_results"] = None
+        st.session_state.started = False
+        st.session_state.show_mic = False
+        st.rerun()
+
+with top_right:
+    st.markdown(
+        "<div style='display:flex;gap:8px;justify-content:flex-end;padding-top:8px'>"
+        "<span style='background:#e3f2fd;color:#1565c0;padding:6px 14px;"
+        "border-radius:20px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;'>👤 ఆశా కార్యకర్త (ASHA Volunteer)</span>"
+        "<a href='#' style='background:#e8f5e9;color:#2e7d32;padding:6px 14px;"
+        "border-radius:20px;font-size:13px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:4px;'>📍 TS Health Portal</a>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+st.markdown("<div style='border-bottom: 1px solid #e0e0e0; margin-bottom: 1.5rem;'></div>", unsafe_allow_html=True)
 
 # -------------------------------------------------------------------
 # VIEW ROUTING: HOME SCREEN vs WORKSPACE (Chat / Pre-check)
 # -------------------------------------------------------------------
 show_home = (
-    len(st.session_state.get("messages", [])) == 0
+    not st.session_state.get("current_answer")
+    and len(st.session_state.get("messages", [])) == 0
     and not st.session_state.get("precheck_submitted", False)
     and not st.session_state.get("started", False)
 )
@@ -776,11 +1192,18 @@ else:
         st.markdown("---")
 
         st.markdown("### 📋 Scheme Filter")
-        scheme_choice = st.radio(
+        scheme_options = ["Both", "PM-JAY", "Aarogyasri"]
+        curr_scheme_idx = scheme_options.index(st.session_state.scheme_choice) if st.session_state.scheme_choice in scheme_options else 0
+        sidebar_scheme = st.radio(
             "Which scheme is the family asking about?",
-            ["Both", "PM-JAY", "Aarogyasri"],
-            index=0,
+            scheme_options,
+            index=curr_scheme_idx,
+            key="sidebar_scheme_radio",
         )
+        if sidebar_scheme != st.session_state.scheme_choice:
+            st.session_state.scheme_choice = sidebar_scheme
+            st.rerun()
+        scheme_choice = st.session_state.scheme_choice
 
         st.markdown("---")
         st.markdown("### 🎯 Quick Questions")
@@ -792,15 +1215,33 @@ else:
             "Hospital ki velladaniki em theesukellali?",
         ]
         for q in quick_questions:
-            if st.button(q, use_container_width=True):
+            if st.button(q, use_container_width=True, key=f"quick_{abs(hash(q))}"):
                 st.session_state["pending_question"] = q
                 st.session_state.active_tab = "chat"
                 st.session_state.started = True
+                st.rerun()
 
         st.markdown("---")
         st.markdown("### ⚙️ Settings")
         show_sources = st.checkbox("Show retrieved sources", value=True)
         show_debug = st.checkbox("Show debug info", value=False)
+
+        st.markdown("---")
+        st.markdown("### 🕐 ఇటీవలి ప్రశ్నలు (Recent)")
+
+        if not st.session_state.recent_questions:
+            st.caption("No recent questions yet")
+        else:
+            for i, item in enumerate(st.session_state.recent_questions[:5]):
+                label = item["q"][:40] + ("..." if len(item["q"]) > 40 else "")
+                if st.button(label, key=f"recent_{i}", use_container_width=True):
+                    st.session_state.current_question = item["q"]
+                    st.session_state.current_answer = item["answer"]
+                    st.session_state.current_structured = item["structured"]
+                    st.session_state.current_chunks = item["chunks"]
+                    st.session_state.active_tab = "chat"
+                    st.session_state.started = True
+                    st.rerun()
 
         st.markdown("---")
         st.caption("Built for the Unleash LLM Innovation Challenge 2026")
@@ -838,169 +1279,155 @@ else:
 
     if st.session_state.active_tab == "chat":
         # ---------------------------------------------------------------
-        # CHAT HISTORY / EMPTY STATE
+        # 1. QUESTION PROCESSING FLOW (WHEN SUBMITTED)
         # ---------------------------------------------------------------
-        if not st.session_state.messages:
+        triggered_question = None
+
+        if st.session_state.pending_question:
+            triggered_question = st.session_state.pending_question
+            st.session_state.pending_question = None
+
+        if triggered_question:
+            st.session_state.current_question = triggered_question
+            st.session_state.current_answer = None
+            st.session_state.current_structured = None
+            st.session_state.current_chunks = []
+
+            retriever = load_retriever()
+            with st.spinner("🔍 Expanding query and retrieving relevant scheme information..."):
+                expanded = expand_query(triggered_question)
+                combined_query = f"{triggered_question} {expanded['keywords']}"
+                chunks = retriever.search(
+                    combined_query,
+                    k=TOP_K_FINAL + 1,
+                    scheme=expanded["scheme"],
+                )
+
+            if st.session_state.scheme_choice != "Both":
+                scheme_map = {"PM-JAY": "pmjay", "Aarogyasri": "aarogyasri"}
+                target = scheme_map[st.session_state.scheme_choice]
+                filtered = [c for c in chunks if c["metadata"]["scheme"] == target]
+                if filtered:
+                    chunks = filtered
+
+            placeholder = st.empty()
+            full_answer = ""
+            try:
+                for token in generate_answer_stream(triggered_question, chunks):
+                    full_answer += token
+                    placeholder.markdown(
+                        f"<div class='av-answer-panel'><h3>📝 సమాధానం (Answer)</h3>"
+                        f"<div class='av-question-bubble'>"
+                        f"<div class='av-question-label'>ప్రశ్న (Question)</div>"
+                        f"<div class='av-question-text'>{triggered_question}</div>"
+                        f"</div>"
+                        f"<div class='av-answer-body' style='font-size:15px;line-height:1.7;'>{full_answer}</div></div>",
+                        unsafe_allow_html=True,
+                    )
+            except Exception as e:
+                st.error(f"Error calling LLM: {e}")
+                full_answer = "క్షమించండి, సాంకేతిక సమస్య ఏర్పడింది. దయచేసి మళ్లీ ప్రయత్నించండి."
+
+            structured = {"documents": [], "next_steps": [], "missing_info": [], "preliminary_only": True}
+            if full_answer and len(full_answer) > 50 and "క్షమించండి" not in full_answer:
+                try:
+                    structured = extract_structured_data(triggered_question, full_answer, chunks)
+                except Exception as e:
+                    st.caption(f"(Structured extraction skipped: {e})")
+
+            st.session_state.current_answer = full_answer
+            st.session_state.current_structured = structured
+            st.session_state.current_chunks = chunks
+
+            # Auto-save to recent questions (deduplicated by question, capped at 10)
+            recents = [r for r in st.session_state.recent_questions if r.get("q") != triggered_question]
+            recents.insert(0, {
+                "q": triggered_question,
+                "answer": full_answer,
+                "structured": structured,
+                "chunks": chunks,
+                "ts": datetime.now().strftime("%Y%m%d-%H%M"),
+            })
+            st.session_state.recent_questions = recents[:10]
+            st.rerun()
+
+        # ---------------------------------------------------------------
+        # 2. ANSWER PANEL (TOP)
+        # ---------------------------------------------------------------
+        if not st.session_state.current_answer:
             st.markdown(
-                "<div style='text-align:center;padding:40px 20px;"
-                "background:#f5f5f5;border-radius:12px;color:#616161;"
-                "margin:20px 0'>"
-                "<div style='font-size:32px;margin-bottom:8px'>💬</div>"
-                "<div style='font-size:16px;margin-bottom:4px;font-weight:600;font-family:\"Noto Sans Telugu\", sans-serif;'>"
+                "<div class='av-empty-state'>"
+                "<div style='font-size:44px;margin-bottom:12px'>💬</div>"
+                "<div style='font-size:18px;font-weight:600;color:#2e7d32;margin-bottom:6px'>"
                 "మీ ప్రశ్న ఇక్కడ కనిపిస్తుంది</div>"
-                "<div style='font-size:14px'>"
-                "Ask a question or select a quick question from the sidebar</div>"
+                "<div style='font-size:14px;color:#616161;margin-bottom:20px'>"
+                "Ask a question to see the guidance here</div>"
                 "</div>",
                 unsafe_allow_html=True,
             )
+            st.markdown(
+                "<div style='text-align:center;font-size:13px;color:#757575;margin-bottom:10px'>"
+                "💡 ప్రయత్నించండి (Try one of these):</div>",
+                unsafe_allow_html=True,
+            )
+            chip_cols = st.columns(3)
+            suggestion_chips = [
+                "PM-JAY eligibility emiti?",
+                "Aarogyasri lo em cover avutundi?",
+                "What documents are required for PM-JAY?",
+            ]
+            for i, chip_text in enumerate(suggestion_chips):
+                with chip_cols[i]:
+                    if st.button(
+                        chip_text,
+                        key=f"chip_{i}",
+                        use_container_width=True,
+                    ):
+                        st.session_state.pending_question = chip_text
+                        st.rerun()
         else:
-            for msg in st.session_state.messages:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"], unsafe_allow_html=True)
-                    if msg["role"] == "assistant" and msg.get("structured"):
-                        _render_structured_cards(msg["structured"])
-                    if msg["role"] == "assistant" and msg.get("content"):
-                        _render_audio_player(
-                            msg["content"],
-                            key_suffix=f"hist_{abs(hash(msg['content'])) % 100000}",
-                        )
-                        if msg.get("question"):
-                            ts = msg.get("timestamp", datetime.now().strftime("%Y%m%d-%H%M"))
-                            download_text = _build_download_text(
-                                msg["question"],
-                                msg["content"],
-                                msg.get("structured", {}),
-                                msg.get("sources", []),
-                            )
-                            st.download_button(
-                                label="📥 Download explanation",
-                                data=download_text.encode("utf-8"),
-                                file_name=f"arogya-vaani-{ts}.txt",
-                                mime="text/plain",
-                                key=f"hist_download_{ts}_{id(msg)}",
-                            )
-                    if msg["role"] == "assistant" and show_sources and msg.get("sources"):
-                        with st.expander(f"📚 Sources ({len(msg['sources'])} chunks retrieved)", expanded=False):
-                            for i, s in enumerate(msg["sources"], 1):
-                                m = s["metadata"]
-                                st.markdown(
-                                    f"<div class='source-box'>"
-                                    f"<b>[{i}] {m['source_file']}</b> — page {m['page']}<br>"
-                                    f"<small>Scheme: <b>{m['scheme']}</b> · Type: {m['doc_type']}</small><br>"
-                                    f"<small>{s['text'][:300]}...</small>"
-                                    f"</div>",
-                                    unsafe_allow_html=True,
-                                )
-
-        # ---------------------------------------------------------------
-        # INPUT — voice input card & chat input
-        # ---------------------------------------------------------------
-        audio_value = st.audio_input(
-            "🎙️ మీ ప్రశ్నను రికార్డ్ చేయండి (Record your question)",
-            key="voice_input_widget",
-        )
-
-        user_question = st.chat_input("Ask about PM-JAY or Aarogyasri (Telugu or English)…")
-
-        if st.session_state.pending_question:
-            user_question = st.session_state.pending_question
-            st.session_state.pending_question = None
-
-        if audio_value is not None and not st.session_state.get("_last_audio_id") == id(audio_value):
-            with st.spinner("🎙️ Transcribing your voice..."):
-                try:
-                    audio_bytes = audio_value.read()
-                    transcript = transcribe_audio(audio_bytes, filename="question.wav")
-                    if transcript:
-                        st.session_state["_last_audio_id"] = id(audio_value)
-                        st.success(f"🎙️ **Transcribed:** {transcript}")
-                        user_question = transcript
-                    else:
-                        st.warning("Could not transcribe the audio. Please try again or type your question.")
-                except Exception as e:
-                    st.error(f"Audio error: {e}")
-
-        # ---------------------------------------------------------------
-        # PROCESS THE QUESTION
-        # ---------------------------------------------------------------
-        if user_question:
-            st.session_state.messages.append({"role": "user", "content": user_question})
-            with st.chat_message("user"):
-                st.markdown(user_question)
-
-            with st.chat_message("assistant"):
-                retriever = load_retriever()
-
-                with st.spinner("🔍 Expanding query and retrieving relevant scheme information..."):
-                    expanded = expand_query(user_question)
-                    combined_query = f"{user_question} {expanded['keywords']}"
-                    chunks = retriever.search(
-                        combined_query,
-                        k=TOP_K_FINAL + 1,
-                        scheme=expanded["scheme"],
-                    )
-
-                if show_debug:
-                    st.caption(f"Expanded keywords: {expanded['keywords']}")
-                    st.caption(f"Detected scheme: {expanded['scheme']}")
-
-                if scheme_choice != "Both":
-                    scheme_map = {"PM-JAY": "pmjay", "Aarogyasri": "aarogyasri"}
-                    target = scheme_map[scheme_choice]
-                    filtered = [c for c in chunks if c["metadata"]["scheme"] == target]
-                    if filtered:
-                        chunks = filtered
-
-                if show_debug:
-                    st.caption(f"Retrieved {len(chunks)} chunks: " +
-                               ", ".join(f"{c['metadata']['source_file']} p{c['metadata']['page']}"
-                                         for c in chunks))
-
-                st.markdown("### 📝 సమాధానం")
-                placeholder = st.empty()
-                full_answer = ""
-
-                try:
-                    for token in generate_answer_stream(user_question, chunks):
-                        full_answer += token
-                        placeholder.markdown(full_answer)
-                except Exception as e:
-                    st.error(f"Error calling LLM: {e}")
-                    full_answer = "క్షమించండి, సాంకేతిక సమస్య ఏర్పడింది. దయచేసి మళ్లీ ప్రయత్నించండి."
-
-                structured = {"documents": [], "next_steps": [], "missing_info": [], "preliminary_only": True}
-                if full_answer and len(full_answer) > 50 and "క్షమించండి" not in full_answer:
-                    try:
-                        structured = extract_structured_data(user_question, full_answer, chunks)
-                    except Exception as e:
-                        st.caption(f"(Structured extraction skipped: {e})")
-
-                _render_structured_cards(structured)
-
-                _render_audio_player(full_answer, key_suffix=f"live_{abs(hash(user_question)) % 100000}")
-
-                download_text = _build_download_text(user_question, full_answer, structured, chunks)
-                timestamp = datetime.now().strftime("%Y%m%d-%H%M")
-                st.download_button(
-                    label="📥 సమాధానాన్ని డౌన్‌లోడ్ చేయండి (Download explanation)",
-                    data=download_text.encode("utf-8"),
-                    file_name=f"arogya-vaani-{timestamp}.txt",
-                    mime="text/plain",
-                    key=f"download_{timestamp}",
+            with st.container():
+                st.markdown(
+                    f"<div class='av-answer-panel'>"
+                    f"<h3 style='margin-top:0;'>📝 సమాధానం (Answer)</h3>"
+                    f"<div class='av-question-bubble'>"
+                    f"<div class='av-question-label'>ప్రశ్న (Question)</div>"
+                    f"<div class='av-question-text'>{st.session_state.current_question}</div>"
+                    f"</div>"
+                    f"<div class='av-answer-body' style='font-size:15px;line-height:1.7;'>{st.session_state.current_answer}</div>"
+                    f"</div>",
+                    unsafe_allow_html=True,
                 )
 
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": full_answer,
-                    "sources": chunks,
-                    "structured": structured,
-                    "question": user_question,
-                    "timestamp": datetime.now().strftime("%Y%m%d-%H%M"),
-                })
+                if st.session_state.current_structured:
+                    _render_structured_cards(st.session_state.current_structured)
 
-                if show_sources:
-                    with st.expander(f"📚 Sources ({len(chunks)} chunks retrieved)", expanded=False):
-                        for i, s in enumerate(chunks, 1):
+                act_col1, act_col2 = st.columns([1, 1], gap="small")
+                with act_col1:
+                    _render_audio_player(
+                        st.session_state.current_answer,
+                        key_suffix=f"workbench_{abs(hash(st.session_state.current_question or '')) % 100000}",
+                    )
+                with act_col2:
+                    download_text = _build_download_text(
+                        st.session_state.current_question or "",
+                        st.session_state.current_answer,
+                        st.session_state.current_structured or {},
+                        st.session_state.current_chunks or [],
+                    )
+                    ts = datetime.now().strftime("%Y%m%d-%H%M")
+                    st.download_button(
+                        label="📥 డౌన్లోడ్",
+                        data=download_text.encode("utf-8"),
+                        file_name=f"arogya-vaani-{ts}.txt",
+                        mime="text/plain",
+                        key="download_current_answer",
+                        use_container_width=True,
+                    )
+
+                if show_sources and st.session_state.current_chunks:
+                    with st.expander(f"📚 Sources ({len(st.session_state.current_chunks)} chunks retrieved)", expanded=False):
+                        for i, s in enumerate(st.session_state.current_chunks, 1):
                             m = s["metadata"]
                             st.markdown(
                                 f"<div class='source-box'>"
@@ -1011,77 +1438,141 @@ else:
                                 unsafe_allow_html=True,
                             )
 
+        # ---------------------------------------------------------------
+        # 3. AUDIO INPUT CARD (CONDITIONAL, ABOVE INPUT ROW)
+        # ---------------------------------------------------------------
+        if st.session_state.show_mic:
+            audio_value = st.audio_input(
+                "🎙️ మీ ప్రశ్నను రికార్డ్ చేయండి (Record your question)",
+                key="voice_input_widget",
+            )
+            if audio_value is not None and st.session_state.get("_last_audio_id") != id(audio_value):
+                with st.spinner("🎙️ Transcribing your voice..."):
+                    try:
+                        audio_bytes = audio_value.read()
+                        transcript = transcribe_audio(audio_bytes, filename="question.wav")
+                        if transcript:
+                            st.session_state["_last_audio_id"] = id(audio_value)
+                            st.session_state["pending_question"] = transcript
+                            st.rerun()
+                        else:
+                            st.warning("Could not transcribe the audio. Please try again or type your question.")
+                    except Exception as e:
+                        st.error(f"Audio error: {e}")
+
+        # ---------------------------------------------------------------
+        # 4. QUESTION INPUT ROW (BOTTOM)
+        # ---------------------------------------------------------------
+        input_col, voice_col, ask_col = st.columns([6, 1.4, 1.4])
+        with input_col:
+            typed_question = st.text_input(
+                "మీ ప్రశ్న",
+                placeholder="ప్రశ్న టైప్ చేయండి లేదా మాట్లాడండి... (Type or speak your question)",
+                label_visibility="collapsed",
+                key="main_question_input",
+            )
+        with voice_col:
+            if st.button("🎤 Voice", key="btn_toggle_voice", use_container_width=True, type="primary" if st.session_state.show_mic else "secondary"):
+                st.session_state.show_mic = not st.session_state.show_mic
+                st.rerun()
+        with ask_col:
+            ask_clicked = st.button("➡️ Ask", key="btn_ask_submit", type="primary", use_container_width=True)
+
+        if (ask_clicked or typed_question) and typed_question.strip():
+            st.session_state["pending_question"] = typed_question.strip()
+            st.rerun()
+
     else:
         # ---------------------------------------------------------------
         # PRELIMINARY ELIGIBILITY CHECK
         # ---------------------------------------------------------------
-        st.markdown("### 📋 Preliminary Eligibility Pre-Check")
-        st.caption(
-            "This is a deterministic rule-based check. No AI is involved. "
-            "Results are INDICATIVE ONLY and do not constitute an official "
-            "eligibility decision."
+        st.markdown(
+            """
+            <div class="av-info-banner">
+              <span class="av-info-icon">ℹ️</span>
+              <span>Deterministic rules engine. No AI generation here. Indicative calculations only. | నిర్ణయ ప్రాథమిక సమాచారం. ఇది కేవలం ప్రాథమిక సూచకం.</span>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
-        scheme_for_check = st.radio(
-            "Select the scheme to check:",
-            ["PM-JAY", "Aarogyasri"],
-            key="precheck_scheme",
-            horizontal=True,
-        )
+        col_form, col_result = st.columns([1, 1], gap="large")
 
-        with st.form("precheck_form"):
-            if scheme_for_check == "PM-JAY":
-                st.markdown("**Tell us about the family:**")
-                has_aadhaar = st.checkbox("Family has an Aadhaar card")
-                has_ration_card = st.checkbox("Family has a Ration Card")
-                has_secc_listing = st.checkbox(
-                    "Family is listed in SECC 2011 / has a known SECC ID"
-                )
-                is_bpl_family = st.checkbox("Family is Below Poverty Line (BPL)")
-                family_size = st.number_input(
-                    "Family size (number of members)",
-                    min_value=0, max_value=30, value=0, step=1,
-                )
-                submitted = st.form_submit_button("Run preliminary check")
+        with col_form:
+            scheme_for_check = st.radio(
+                "Select the scheme to check:",
+                ["PM-JAY", "Aarogyasri"],
+                key="precheck_scheme",
+                horizontal=True,
+            )
 
-                if submitted:
-                    st.session_state.precheck_submitted = True
-                    rules = check_pmjay(
-                        has_aadhaar=has_aadhaar,
-                        has_ration_card=has_ration_card,
-                        has_secc_listing=has_secc_listing,
-                        is_bpl_family=is_bpl_family,
-                        family_size=int(family_size),
+            with st.form("precheck_form"):
+                st.markdown(
+                    """
+                    <div class="av-card-header">📝 లబ్ధిదారుని వివరాలు (Enter Details)</div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+                if scheme_for_check == "PM-JAY":
+                    st.markdown("**Tell us about the family:**")
+                    has_aadhaar = st.checkbox("Family has an Aadhaar card")
+                    has_ration_card = st.checkbox("Family has a Ration Card")
+                    has_secc_listing = st.checkbox(
+                        "Family is listed in SECC 2011 / has a known SECC ID"
                     )
-                    _render_precheck_results(rules, scheme="PM-JAY")
-
-            else:  # Aarogyasri
-                st.markdown("**Tell us about the family:**")
-                is_telangana_resident = st.checkbox("Family lives in Telangana")
-                has_white_ration_card = st.checkbox(
-                    "Family has a White Ration Card"
-                )
-                has_aadhaar2 = st.checkbox("Family has an Aadhaar card")
-                submitted = st.form_submit_button("Run preliminary check")
-
-                if submitted:
-                    st.session_state.precheck_submitted = True
-                    rules = check_aarogyasri(
-                        has_aadhaar=has_aadhaar2,
-                        has_white_ration_card=has_white_ration_card,
-                        is_telangana_resident=is_telangana_resident,
+                    is_bpl_family = st.checkbox("Family is Below Poverty Line (BPL)")
+                    family_size = st.number_input(
+                        "Family size (number of members)",
+                        min_value=0, max_value=30, value=0, step=1,
                     )
-                    _render_precheck_results(rules, scheme="Aarogyasri")
+                    submitted = st.form_submit_button("అర్హత తనిఖీ చేయండి (Run Check)")
 
-    # Clear chat button
-    if st.session_state.messages or st.session_state.get("precheck_submitted"):
-        st.markdown("---")
-        if st.button("🗑️ Clear conversation"):
-            st.session_state.messages = []
-            st.session_state.precheck_submitted = False
-            st.session_state.started = False
-            st.session_state.active_tab = "chat"
-            st.rerun()
+                    if submitted:
+                        st.session_state.precheck_submitted = True
+                        rules = check_pmjay(
+                            has_aadhaar=has_aadhaar,
+                            has_ration_card=has_ration_card,
+                            has_secc_listing=has_secc_listing,
+                            is_bpl_family=is_bpl_family,
+                            family_size=int(family_size),
+                        )
+                        st.session_state["precheck_results"] = (rules, "PM-JAY")
+                        st.rerun()
+
+                else:  # Aarogyasri
+                    st.markdown("**Tell us about the family:**")
+                    is_telangana_resident = st.checkbox("Family lives in Telangana")
+                    has_white_ration_card = st.checkbox(
+                        "Family has a White Ration Card"
+                    )
+                    has_aadhaar2 = st.checkbox("Family has an Aadhaar card")
+                    submitted = st.form_submit_button("అర్హత తనిఖీ చేయండి (Run Check)")
+
+                    if submitted:
+                        st.session_state.precheck_submitted = True
+                        rules = check_aarogyasri(
+                            has_aadhaar=has_aadhaar2,
+                            has_white_ration_card=has_white_ration_card,
+                            is_telangana_resident=is_telangana_resident,
+                        )
+                        st.session_state["precheck_results"] = (rules, "Aarogyasri")
+                        st.rerun()
+
+        with col_result:
+            if st.session_state.get("precheck_results"):
+                res_rules, res_scheme = st.session_state["precheck_results"]
+                _render_precheck_results(res_rules, res_scheme)
+            else:
+                st.markdown(
+                    """
+                    <div style="text-align:center;padding:48px 24px;background:#f9f9f9;border:1px dashed #e0e0e0;border-radius:12px;color:#757575;">
+                      <div style="font-size:32px;margin-bottom:8px;">📋</div>
+                      <div style="font-size:15px;font-weight:600;color:#424242;margin-bottom:4px;">ప్రాథమిక అర్హత ఫలితాలు ఇక్కడ కనిపిస్తాయి</div>
+                      <div style="font-size:13px;">Fill out the family details on the left and click Run Check.</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 # -------------------------------------------------------------------
 # FOOTER (GLOBAL)
